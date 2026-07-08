@@ -8,8 +8,6 @@ services:
       - "9093:9093"
     volumes:
       - ./kafka-data/kafka1-storage:/tmp/kafka-logs
-    networks:
-      - kafka-net
     environment:
       KAFKA_PROCESS_ROLES: 'broker,controller'
       KAFKA_NODE_ID: 1
@@ -30,8 +28,8 @@ services:
       - "9094:9092"
     volumes:
       - ./kafka-data/kafka2-storage:/tmp/kafka-logs
-    networks:
-      - kafka-net
+    depends_on:
+      - kafka-1
     environment:
       KAFKA_PROCESS_ROLES: 'broker'
       KAFKA_NODE_ID: 2
@@ -52,8 +50,8 @@ services:
       - "9095:9092"
     volumes:
       - ./kafka-data/kafka3-storage:/tmp/kafka-logs
-    networks:
-      - kafka-net
+    depends_on:
+      - kafka-1
     environment:
       KAFKA_PROCESS_ROLES: 'broker'
       KAFKA_NODE_ID: 3
@@ -71,8 +69,6 @@ services:
     container_name: kafka-ui
     ports:
       - "8080:8080"
-    networks:
-      - kafka-net
     depends_on:
       - kafka-1
       - kafka-2
@@ -80,24 +76,6 @@ services:
     environment:
       KAFKA_CLUSTERS_0_NAME: 'multi-node-cluster'
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: 'KAFKA-1:29092,KAFKA-2:29092,KAFKA-3:29092'
-
-  redpanda-console:
-    image: redpandadata/console:latest
-    container_name: redpanda-console
-    ports:
-      - "7070:8080"
-    networks:
-      - kafka-net
-    depends_on:
-      - kafka-1
-      - kafka-2
-      - kafka-3
-    environment:
-      KAFKA_BROKERS: 'KAFKA-1:29092,KAFKA-2:29092,KAFKA-3:29092'
-
-networks:
-  kafka-net:
-    driver: bridge
 
 volumes:
   kafka-data:
