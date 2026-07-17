@@ -11,6 +11,11 @@ func main() {
 	// Create a new producer instance
 	p, err := kafka.NewProducer(&kafka.ConfigMap{
 		"bootstrap.servers": "localhost:9095",
+		// Idempotence config
+		"enable.idempotence":                    true,
+		"acks":                                  "all",
+		"retries":                               10,
+		"max.in.flight.requests.per.connection": 5,
 	})
 
 	if err != nil {

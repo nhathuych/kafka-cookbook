@@ -15,6 +15,9 @@ func main() {
 	writer := &kafka.Writer{
 		Addr:  kafka.TCP("localhost:9094"),
 		Topic: topic,
+		// Idempotence config
+		RequiredAcks: kafka.RequireAll, // Enables idempotent writes
+		MaxAttempts:  10,
 	}
 
 	defer func() {
