@@ -1,0 +1,100 @@
+services:
+  kafka-1:
+    image: apache/kafka:4.0.0
+    hostname: kafka-1
+    container_name: kafka-1
+    ports:
+      - "9092:9092"
+      - "9093:9093"
+    volumes:
+      - kafka1-data:/var/lib/kafka/data
+    environment:
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_NODE_ID: 1
+      CLUSTER_ID: 'Qqz3-CYHTt-Vwdr02bSjOw'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka-1:9093'
+      KAFKA_LISTENERS: 'BROKER://kafka-1:29092,EXTERNAL://0.0.0.0:9092,CONTROLLER://kafka-1:9093'
+      KAFKA_ADVERTISED_LISTENERS: 'BROKER://kafka-1:29092,EXTERNAL://localhost:9092'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'BROKER'
+      KAFKA_LOG_DIRS: '/var/lib/kafka/data'
+
+  kafka-2:
+    image: apache/kafka:4.0.0
+    hostname: kafka-2
+    container_name: kafka-2
+    ports:
+      - "9094:9092"
+    volumes:
+      - kafka2-data:/var/lib/kafka/data
+    depends_on:
+      - kafka-1
+    environment:
+      KAFKA_PROCESS_ROLES: 'broker'
+      KAFKA_NODE_ID: 2
+      CLUSTER_ID: 'Qqz3-CYHTt-Vwdr02bSjOw'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka-1:9093'
+      KAFKA_LISTENERS: 'BROKER://kafka-2:29092,EXTERNAL://0.0.0.0:9092'
+      KAFKA_ADVERTISED_LISTENERS: 'BROKER://kafka-2:29092,EXTERNAL://localhost:9094'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'BROKER'
+      KAFKA_LOG_DIRS: '/var/lib/kafka/data'
+
+  kafka-3:
+    image: apache/kafka:4.0.0
+    hostname: kafka-3
+    container_name: kafka-3
+    ports:
+      - "9095:9092"
+    volumes:
+      - kafka3-data:/var/lib/kafka/data
+    depends_on:
+      - kafka-1
+    environment:
+      KAFKA_PROCESS_ROLES: 'broker'
+      KAFKA_NODE_ID: 3
+      CLUSTER_ID: 'Qqz3-CYHTt-Vwdr02bSjOw'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka-1:9093'
+      KAFKA_LISTENERS: 'BROKER://kafka-3:29092,EXTERNAL://0.0.0.0:9092'
+      KAFKA_ADVERTISED_LISTENERS: 'BROKER://kafka-3:29092,EXTERNAL://localhost:9095'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'BROKER'
+      KAFKA_LOG_DIRS: '/var/lib/kafka/data'
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:latest
+    container_name: schema-registry
+    hostname: schema-registry
+    ports:
+      - "8081:8081"
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'kafka-1:29092,kafka-2:29092,kafka-3:29092'
+
+  kafbat-ui:
+    image: ghcr.io/kafbat/kafka-ui:latest
+    container_name: kafbat-ui
+    ports:
+      - "8080:8080"
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+      - schema-registry
+    environment:
+      DYNAMIC_CONFIG_ENABLED: 'true'
+      KAFKA_CLUSTERS_0_NAME: 'multi-node-cluster'
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: 'kafka-1:29092,kafka-2:29092,kafka-3:29092'
+      KAFKA_CLUSTERS_0_SCHEMAREGISTRY: 'http://schema-registry:8081'
+
+volumes:
+  kafka1-data:
+  kafka2-data:
+  kafka3-data:
