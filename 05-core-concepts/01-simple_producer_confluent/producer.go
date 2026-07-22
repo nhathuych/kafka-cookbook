@@ -41,5 +41,5 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println("Message sent successfully!")
+	fmt.Println("Message was successfully handed off to the producer's internal buffer!")
 }
