@@ -1,0 +1,1 @@
+This is the first line. Press Enter to add a newline, then save the file to produce a Kafka message.
