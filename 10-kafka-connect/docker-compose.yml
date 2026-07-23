@@ -94,6 +94,23 @@ services:
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: 'kafka-1:29092,kafka-2:29092,kafka-3:29092'
       KAFKA_CLUSTERS_0_SCHEMAREGISTRY: 'http://schema-registry:8081'
 
+  # Additional Service for Kafka Connect in distributed mode
+  connect-distributed:
+    image: apache/kafka:4.0.0
+    hostname: connect-distributed
+    container_name: connect-distributed
+    command: >
+      /bin/bash -c "/opt/kafka/bin/connect-distributed.sh /tmp/connect-distributed.properties"
+    ports:
+      - "8083:8083"
+    volumes:
+      - ./connect-distributed.properties:/tmp/connect-distributed.properties
+      - ./input.txt:/tmp/input.txt
+    depends_on:
+      - kafka-1
+      - kafka-2
+      - kafka-3
+
 volumes:
   kafka1-data:
   kafka2-data:
