@@ -106,6 +106,7 @@ services:
     volumes:
       - ./connect-distributed.properties:/tmp/connect-distributed.properties
       - ./input.txt:/tmp/input.txt
+      - ./input.json:/tmp/input.json
     depends_on:
       - kafka-1
       - kafka-2
