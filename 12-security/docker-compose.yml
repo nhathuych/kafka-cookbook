@@ -6,21 +6,26 @@ services:
     ports:
       - "9092:9092"
       - "9093:9093"
+      - "9097:9096" # SECURED for Applications
     volumes:
       - kafka1-data:/var/lib/kafka/data
+      - ./kafka_server_jaas.conf:/tmp/kafka_server_jaas.conf
     environment:
       KAFKA_PROCESS_ROLES: 'broker,controller'
       KAFKA_NODE_ID: 1
       CLUSTER_ID: 'Qqz3-CYHTt-Vwdr02bSjOw'
       KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka-1:9093'
-      KAFKA_LISTENERS: 'BROKER://kafka-1:29092,EXTERNAL://0.0.0.0:9092,CONTROLLER://kafka-1:9093'
-      KAFKA_ADVERTISED_LISTENERS: 'BROKER://kafka-1:29092,EXTERNAL://localhost:9092'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT'
+      KAFKA_LISTENERS: 'BROKER://kafka-1:29092,EXTERNAL://0.0.0.0:9092,CONTROLLER://kafka-1:9093,EXTERNAL_SECURE://0.0.0.0:9096'
+      KAFKA_ADVERTISED_LISTENERS: 'BROKER://kafka-1:29092,EXTERNAL://localhost:9092,EXTERNAL_SECURE://localhost:9097'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL_SECURE:SASL_PLAINTEXT'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_INTER_BROKER_LISTENER_NAME: 'BROKER'
       KAFKA_LOG_DIRS: '/var/lib/kafka/data'
       KAFKA_UNSTABLE_API_VERSIONS_ENABLE: 'true'
       KAFKA_GROUP_COORDINATOR_REBALANCE_PROTOCOLS: 'classic,consumer,share'
+      KAFKA_SASL_ENABLED_MECHANISMS: 'SCRAM-SHA-256'
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: 'SCRAM-SHA-256'
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/tmp/kafka_server_jaas.conf"
 
   kafka-2:
     image: apache/kafka:4.0.0
@@ -28,8 +33,10 @@ services:
     container_name: kafka-2
     ports:
       - "9094:9092"
+      - "9098:9096"
     volumes:
       - kafka2-data:/var/lib/kafka/data
+      - ./kafka_server_jaas.conf:/tmp/kafka_server_jaas.conf
     depends_on:
       - kafka-1
     environment:
@@ -37,14 +44,17 @@ services:
       KAFKA_NODE_ID: 2
       CLUSTER_ID: 'Qqz3-CYHTt-Vwdr02bSjOw'
       KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka-1:9093'
-      KAFKA_LISTENERS: 'BROKER://kafka-2:29092,EXTERNAL://0.0.0.0:9092'
-      KAFKA_ADVERTISED_LISTENERS: 'BROKER://kafka-2:29092,EXTERNAL://localhost:9094'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT'
+      KAFKA_LISTENERS: 'BROKER://kafka-2:29092,EXTERNAL://0.0.0.0:9092,EXTERNAL_SECURE://0.0.0.0:9096'
+      KAFKA_ADVERTISED_LISTENERS: 'BROKER://kafka-2:29092,EXTERNAL://localhost:9094,EXTERNAL_SECURE://localhost:9098'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL_SECURE:SASL_PLAINTEXT'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_INTER_BROKER_LISTENER_NAME: 'BROKER'
       KAFKA_LOG_DIRS: '/var/lib/kafka/data'
       KAFKA_UNSTABLE_API_VERSIONS_ENABLE: 'true'
       KAFKA_GROUP_COORDINATOR_REBALANCE_PROTOCOLS: 'classic,consumer,share'
+      KAFKA_SASL_ENABLED_MECHANISMS: 'SCRAM-SHA-256'
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: 'SCRAM-SHA-256'
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/tmp/kafka_server_jaas.conf"
 
   kafka-3:
     image: apache/kafka:4.0.0
@@ -52,8 +62,10 @@ services:
     container_name: kafka-3
     ports:
       - "9095:9092"
+      - "9099:9096"
     volumes:
       - kafka3-data:/var/lib/kafka/data
+      - ./kafka_server_jaas.conf:/tmp/kafka_server_jaas.conf
     depends_on:
       - kafka-1
     environment:
@@ -61,14 +73,17 @@ services:
       KAFKA_NODE_ID: 3
       CLUSTER_ID: 'Qqz3-CYHTt-Vwdr02bSjOw'
       KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka-1:9093'
-      KAFKA_LISTENERS: 'BROKER://kafka-3:29092,EXTERNAL://0.0.0.0:9092'
-      KAFKA_ADVERTISED_LISTENERS: 'BROKER://kafka-3:29092,EXTERNAL://localhost:9095'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT'
+      KAFKA_LISTENERS: 'BROKER://kafka-3:29092,EXTERNAL://0.0.0.0:9092,EXTERNAL_SECURE://0.0.0.0:9096'
+      KAFKA_ADVERTISED_LISTENERS: 'BROKER://kafka-3:29092,EXTERNAL://localhost:9095,EXTERNAL_SECURE://localhost:9099'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL_SECURE:SASL_PLAINTEXT'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_INTER_BROKER_LISTENER_NAME: 'BROKER'
       KAFKA_LOG_DIRS: '/var/lib/kafka/data'
       KAFKA_UNSTABLE_API_VERSIONS_ENABLE: 'true'
       KAFKA_GROUP_COORDINATOR_REBALANCE_PROTOCOLS: 'classic,consumer,share'
+      KAFKA_SASL_ENABLED_MECHANISMS: 'SCRAM-SHA-256'
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: 'SCRAM-SHA-256'
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/tmp/kafka_server_jaas.conf"
 
   kafka-4:
     image: apache/kafka:4.0.0
@@ -76,8 +91,10 @@ services:
     container_name: kafka-4
     ports:
       - "9096:9092"
+      - "9100:9096"
     volumes:
       - kafka4-data:/var/lib/kafka/data
+      - ./kafka_server_jaas.conf:/tmp/kafka_server_jaas.conf
     depends_on:
       - kafka-1
     environment:
@@ -85,14 +102,17 @@ services:
       KAFKA_NODE_ID: 4
       CLUSTER_ID: 'Qqz3-CYHTt-Vwdr02bSjOw'
       KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka-1:9093'
-      KAFKA_LISTENERS: 'BROKER://kafka-4:29092,EXTERNAL://0.0.0.0:9092'
-      KAFKA_ADVERTISED_LISTENERS: 'BROKER://kafka-4:29092,EXTERNAL://localhost:9096'
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT'
+      KAFKA_LISTENERS: 'BROKER://kafka-4:29092,EXTERNAL://0.0.0.0:9092,EXTERNAL_SECURE://0.0.0.0:9096'
+      KAFKA_ADVERTISED_LISTENERS: 'BROKER://kafka-4:29092,EXTERNAL://localhost:9096,EXTERNAL_SECURE://localhost:9100'
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'BROKER:PLAINTEXT,EXTERNAL:PLAINTEXT,CONTROLLER:PLAINTEXT,EXTERNAL_SECURE:SASL_PLAINTEXT'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_INTER_BROKER_LISTENER_NAME: 'BROKER'
       KAFKA_LOG_DIRS: '/var/lib/kafka/data'
       KAFKA_UNSTABLE_API_VERSIONS_ENABLE: 'true'
       KAFKA_GROUP_COORDINATOR_REBALANCE_PROTOCOLS: 'classic,consumer,share'
+      KAFKA_SASL_ENABLED_MECHANISMS: 'SCRAM-SHA-256'
+      KAFKA_SASL_MECHANISM_INTER_BROKER_PROTOCOL: 'SCRAM-SHA-256'
+      KAFKA_OPTS: "-Djava.security.auth.login.config=/tmp/kafka_server_jaas.conf"
 
   schema-registry:
     image: confluentinc/cp-schema-registry:latest
